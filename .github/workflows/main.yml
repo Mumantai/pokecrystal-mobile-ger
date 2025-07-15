@@ -10,24 +10,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
+      - name: Systempackete aktualisieren
+        run: |
+          sudo apt update
+          sudo ACCEPT_EULA=Y apt -y --fix-missing --allow-downgrades upgrade
+          sudo apt -y --allow-downgrades install make g++-10 bison git python-is-python3 python3-pip bison pkg-config libpng-dev
+          sudo pip install pypng
 
-      - name: Checkout rgbds
-        uses: actions/checkout@master
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: RGBDS auschecken
+        uses: actions/checkout@v4
         with:
-          path: rgbds
-          ref: v0.6.1
           repository: gbdev/rgbds
+          path: rgbds
+          ref: 'v0.6.1'
 
-      - name: Install rgbds
-        working-directory: rgbds
+      - name: RGBDS installieren
         run: |
+          cd rgbds
+          make Q=
           sudo make install
-
-      - name: Remove rgbds
-        run: |
-          rm -rf rgbds
 
       - name: Make
         if: ${{ github.repository_owner != 'pret' }}
