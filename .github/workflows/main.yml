@@ -1,6 +1,7 @@
-name: CI
+name: Build ROM
 
 on:
+  workflow_dispatch:
   push:
     branches: [ master ]
   pull_request:
@@ -28,50 +29,17 @@ jobs:
         run: |
           rm -rf rgbds
 
-      - name: Compare
-        if: ${{ github.repository_owner == 'pret' }}
-        run: |
-          make DEBUG=1 -j$(nproc) compare
-          if ! git diff-index --quiet HEAD --; then
-            echo 'Uncommitted changes detected:'
-            git diff-index HEAD --
-            return 1
-          fi
-
       - name: Make
         if: ${{ github.repository_owner != 'pret' }}
         run: |
           make -j$(nproc)
-          if ! git diff-index --quiet HEAD --; then
-            echo 'Uncommitted changes detected:'
-            git diff-index HEAD --
-            return 1
-          fi
 
-      - name: Discord webhook
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'pret' }}
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        run: |
-          .github/webhook.sh
-
-      - name: Checkout symbols
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'pret' }}
-        uses: actions/checkout@master
+      - name: ROM hochladen
+        uses: actions/upload-artifact@v4
         with:
-          path: symbols
-          ref: symbols
-
-      - name: Move symbols
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'pret' }}
-        run: |
-          cp -v *.sym symbols/
-
-      - name: Update symbols
-        if: ${{ github.event_name == 'push' && github.repository_owner == 'pret' }}
-        uses: EndBug/add-and-commit@v7
-        with:
-          branch: symbols
-          cwd: "./symbols"
-          add: "*.sym"
-          message: ${{ github.event.commits[0].message }}
+          name: roms
+          path: |
+            pokecrystal.gbc
+            pokecrystal11.gbc
+            pokecrystal_debug.gbc
+            pokecrystal11_debug.gbc
