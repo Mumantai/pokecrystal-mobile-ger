@@ -36,7 +36,7 @@ jobs:
       - name: Make
         if: ${{ github.repository_owner != 'pret' }}
         run: |
-          make -j$(nproc)
+          make all
 
       - name: ROM hochladen
         uses: actions/upload-artifact@v4
