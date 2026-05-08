@@ -13,8 +13,7 @@ jobs:
       - name: Systempackete aktualisieren
         run: |
           sudo apt update
-          sudo ACCEPT_EULA=Y apt -y --fix-missing --allow-downgrades upgrade
-          sudo apt -y --allow-downgrades install make g++-10 bison git python-is-python3 python3-pip bison pkg-config libpng-dev
+          sudo apt -y --allow-downgrades install make g++-10 flex bison git python-is-python3 python3-pip bison pkg-config libpng-dev
           sudo pip install pypng
 
       - name: Repository auschecken
@@ -36,7 +35,7 @@ jobs:
       - name: Make
         if: ${{ github.repository_owner != 'pret' }}
         run: |
-          make all
+          make -j $(roms)
 
       - name: ROM hochladen
         uses: actions/upload-artifact@v4
@@ -47,3 +46,4 @@ jobs:
             pokecrystal11.gbc
             pokecrystal_debug.gbc
             pokecrystal11_debug.gbc
+            pokecrystal.map
